@@ -1,0 +1,58 @@
+import { ResourceItem } from '../types/curriculum';
+
+export const RECOMMENDED_RESOURCES: ResourceItem[] = [
+  {
+    id: 'res-mdn',
+    title: 'MDN Web Docs (Mozilla Developer Network)',
+    type: 'doc',
+    description: 'La biblia oficial y gratuita del desarrollo web. Documentación exhaustiva en español de HTML, CSS y JavaScript.',
+    url: 'https://developer.mozilla.org/es/',
+    tag: 'Documentación Oficial',
+    recommendedFor: 'Módulo 1 & Módulo 2',
+  },
+  {
+    id: 'res-javascript-info',
+    title: 'The Modern JavaScript Tutorial (javascript.info)',
+    type: 'book',
+    description: 'El tutorial moderno de JavaScript más completo del mundo, traducido al español, desde conceptos elementales hasta temas avanzados.',
+    url: 'https://es.javascript.info/',
+    tag: 'Guía Completa',
+    recommendedFor: 'Módulo 1 & 2 (JavaScript)',
+  },
+  {
+    id: 'res-git-cheatsheet',
+    title: 'Git Cheatsheet Oficial (GitHub)',
+    type: 'cheatsheet',
+    description: 'Hoja de trucos rápida con los comandos más usados de Git: ramas, commits, tags, merges y resolución de conflictos.',
+    url: 'https://education.github.com/git-cheat-sheet-education.pdf',
+    tag: 'Hoja de Trucos',
+    recommendedFor: 'Módulo 1 (Git & GitHub)',
+  },
+  {
+    id: 'res-react-dev',
+    title: 'React.dev (Documentación Oficial Interactiva)',
+    type: 'doc',
+    description: 'La nueva documentación oficial de React con diagramas visuales, retos interactivos y filosofía moderna de componentes.',
+    url: 'https://es.react.dev/',
+    tag: 'Documentación Oficial',
+    recommendedFor: 'Módulo 2 (React)',
+  },
+  {
+    id: 'res-prisma-docs',
+    title: 'Prisma ORM Quickstart Guide',
+    type: 'doc',
+    description: 'Aprende a conectar bases de datos PostgreSQL y escribir consultas tipadas de manera segura y productiva.',
+    url: 'https://www.prisma.io/docs/getting-started',
+    tag: 'ORM / Bases de Datos',
+    recommendedFor: 'Módulo 4 (Bases de Datos)',
+  },
+  {
+    id: 'res-roadmap-sh',
+    title: 'Roadmap.sh (Rutas visuales de ingeniería)',
+    type: 'tool',
+    description: 'Mapas conceptuales visuales de la comunidad internacional para ingenieros Frontend, Backend y DevOps.',
+    url: 'https://roadmap.sh',
+    tag: 'Infografías y Rutas',
+    recommendedFor: 'Carrera Profesional',
+  },
+];
