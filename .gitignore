@@ -18,6 +18,9 @@ dist-ssr
 # Archivos de notas temporales (pueden contener tokens)
 lee*.txt
 
+# Configuración local de Vercel CLI
+.vercel
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
