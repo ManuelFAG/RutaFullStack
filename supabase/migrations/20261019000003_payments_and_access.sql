@@ -113,7 +113,9 @@ DECLARE
   v_sub_id UUID;
 BEGIN
   -- Autorización: solo puedes activar tu propia suscripción (o un admin por otro usuario)
-  IF NOT (auth.uid() = p_user_id OR public.is_admin()) THEN
+  -- NOTA: COALESCE es imprescindible porque auth.uid() es NULL para anónimos y
+  -- en SQL `NULL = x` evalúa a NULL, lo que saltaría el control de acceso.
+  IF NOT (COALESCE(auth.uid() = p_user_id, FALSE) OR public.is_admin()) THEN
     RAISE EXCEPTION 'No autorizado para activar la suscripción del usuario %', p_user_id;
   END IF;
 
