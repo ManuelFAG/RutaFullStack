@@ -190,6 +190,26 @@ class ProgressService {
     this.repository = newRepo;
   }
 
+  public async connectSupabaseUser(userId: string): Promise<UserProgress> {
+    const { SupabaseProgressAdapter } = await import('./storage/supabaseProgressAdapter');
+    const localAdapter = new LocalStorageProgressAdapter();
+    const localProgress = await localAdapter.getProgress();
+
+    const cloudAdapter = new SupabaseProgressAdapter(userId);
+    // Fusionar y subir progreso local acumulado
+    const merged = await cloudAdapter.syncFromLocal(localProgress);
+    this.repository = cloudAdapter;
+    window.dispatchEvent(new CustomEvent('rutafullstack:progress-updated', { detail: merged }));
+    return merged;
+  }
+
+  public disconnectUser(): void {
+    this.repository = new LocalStorageProgressAdapter();
+    this.getProgress().then((progress) => {
+      window.dispatchEvent(new CustomEvent('rutafullstack:progress-updated', { detail: progress }));
+    });
+  }
+
   public async getProgress(): Promise<UserProgress> {
     return this.repository.getProgress();
   }

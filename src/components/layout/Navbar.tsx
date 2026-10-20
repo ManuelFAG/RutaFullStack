@@ -13,12 +13,20 @@ import {
   HelpCircle,
   FolderGit2,
   BookmarkCheck,
+  Layers,
+  Sparkles,
 } from 'lucide-react';
 import { useProgress } from '../../hooks/useProgress';
 import { useTheme } from '../../hooks/useTheme';
+import { useAuth } from '../../contexts/AuthContext';
+import { useBilling } from '../../contexts/BillingContext';
 import { DataBackupModal } from '../common/DataBackupModal';
+import { UserMenu } from '../auth/UserMenu';
+import { AuthModal } from '../auth/AuthModal';
+import { ProfileModal } from '../auth/ProfileModal';
+import { PricingModal } from '../pricing/PricingModal';
 
-export type ActiveView = 'home' | 'dashboard' | 'lesson' | 'test' | 'glossary' | 'resources';
+export type ActiveView = 'home' | 'dashboard' | 'lesson' | 'test' | 'glossary' | 'resources' | 'crm';
 
 interface NavbarProps {
   currentView: ActiveView;
@@ -28,8 +36,12 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate }) => {
   const { stats } = useProgress();
   const { isDark, toggleTheme } = useTheme();
+  const { isAdmin } = useAuth();
+  const { isPro, isPricingOpen, openPricing, closePricing } = useBilling();
   const [isBackupOpen, setIsBackupOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const navLinks: Array<{ id: ActiveView; label: string; icon: React.ReactNode }> = [
     { id: 'home', label: 'Ruta de Módulos', icon: <Compass className="w-4 h-4" /> },
@@ -37,6 +49,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate }) => {
     { id: 'test', label: 'Test de Nivel', icon: <HelpCircle className="w-4 h-4" /> },
     { id: 'glossary', label: 'Glosario', icon: <BookOpen className="w-4 h-4" /> },
     { id: 'resources', label: 'Recursos', icon: <FolderGit2 className="w-4 h-4" /> },
+    ...(isAdmin ? [{ id: 'crm' as ActiveView, label: 'Panel CRM', icon: <Layers className="w-4 h-4 text-purple-400" /> }] : []),
   ];
 
   return (
@@ -111,6 +124,26 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate }) => {
               </span>
             </div>
 
+            {/* CTA de Planes / Estado Pro */}
+            {isPro ? (
+              <span
+                className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-bold"
+                title="Tienes acceso completo a los 8 módulos"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                Pro
+              </span>
+            ) : (
+              <button
+                onClick={openPricing}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-emerald-500/20 hover:from-amber-500/30 hover:to-emerald-500/30 border border-amber-500/30 text-amber-300 hover:text-amber-200 text-xs font-bold transition-all"
+                title="Ver planes y desbloquear todos los módulos"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>Planes</span>
+              </button>
+            )}
+
             {/* Modal de Copia de Seguridad */}
             <button
               onClick={() => setIsBackupOpen(true)}
@@ -128,6 +161,13 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate }) => {
             >
               {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
             </button>
+
+            {/* Menú de Autenticación / Perfil de Usuario */}
+            <UserMenu
+              onOpenAuth={() => setIsAuthOpen(true)}
+              onOpenProfile={() => setIsProfileOpen(true)}
+              onNavigateCRM={() => onNavigate('crm')}
+            />
 
             {/* Menú Móvil Botón */}
             <button
@@ -162,12 +202,35 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate }) => {
                 </button>
               );
             })}
+            {!isPro && (
+              <button
+                onClick={() => {
+                  openPricing();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30"
+              >
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span>Desbloquear Plan Pro</span>
+              </button>
+            )}
           </div>
         )}
       </header>
 
       {/* Modal de Respaldo */}
       <DataBackupModal isOpen={isBackupOpen} onClose={() => setIsBackupOpen(false)} />
+
+      {/* Modales de Autenticación y Perfil */}
+      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+      <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
+
+      {/* Modal de Planes / Precios */}
+      <PricingModal
+        isOpen={isPricingOpen}
+        onClose={closePricing}
+        onOpenAuthModal={() => setIsAuthOpen(true)}
+      />
     </>
   );
 };

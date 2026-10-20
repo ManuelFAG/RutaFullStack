@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ALL_MODULES } from '../../data/modules';
 import { useProgress } from '../../hooks/useProgress';
+import { useBilling } from '../../contexts/BillingContext';
 import {
   Search,
   CheckCircle2,
@@ -32,6 +33,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggle,
 }) => {
   const { progress } = useProgress();
+  const { hasModuleAccess, openPricing } = useBilling();
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedModules, setExpandedModules] = useState<Record<number, boolean>>({
     1: true,
@@ -125,24 +127,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
           const completedCount = module.lessons.filter((l) =>
             progress.completedLessons.includes(l.id)
           ).length;
-          const isLocked = module.id > 1 && module.lessons.length === 0;
+          const isModuleLocked = !hasModuleAccess(module.id);
 
           return (
             <div
               key={module.id}
-              className="rounded-xl border border-slate-800/80 bg-slate-900/40 overflow-hidden"
+              className={`rounded-xl border overflow-hidden transition-all ${
+                isModuleLocked
+                  ? 'border-amber-500/20 bg-slate-900/30'
+                  : 'border-slate-800/80 bg-slate-900/40'
+              }`}
             >
               {/* Encabezado del Módulo */}
               <button
-                onClick={() => !isLocked && toggleModule(module.id)}
-                className={`w-full p-3 flex items-center justify-between text-left transition ${
-                  isLocked ? 'opacity-60 cursor-not-allowed' : 'hover:bg-slate-800/40'
-                }`}
+                onClick={() => toggleModule(module.id)}
+                className="w-full p-3 flex items-center justify-between text-left hover:bg-slate-800/40 transition"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span
                     className={`p-1.5 rounded-lg shrink-0 ${
-                      module.id === 1
+                      isModuleLocked
+                        ? 'bg-amber-500/10 text-amber-400'
+                        : module.id === 1
                         ? 'bg-emerald-500/15 text-emerald-400'
                         : 'bg-slate-800 text-slate-400'
                     }`}
@@ -150,18 +156,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     {getModuleIcon(module.icon)}
                   </span>
                   <div className="truncate">
-                    <h4 className="text-xs font-bold text-slate-200 truncate">{module.title}</h4>
+                    <div className="flex items-center gap-1.5">
+                      <h4 className="text-xs font-bold text-slate-200 truncate">{module.title}</h4>
+                      {isModuleLocked && (
+                        <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold shrink-0">
+                          PRO
+                        </span>
+                      )}
+                    </div>
                     <span className="text-[10px] text-slate-400">
-                      {module.lessons.length > 0
-                        ? `${completedCount}/${module.lessons.length} completadas`
-                        : 'Próximamente (Fase incremental)'}
+                      {isModuleLocked
+                        ? 'Bloqueado • Requiere Plan Pro'
+                        : `${completedCount}/${module.lessons.length} completadas`}
                     </span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-1 shrink-0 ml-2">
-                  {isLocked ? (
-                    <Lock className="w-3.5 h-3.5 text-slate-500" />
+                  {isModuleLocked ? (
+                    <Lock className="w-3.5 h-3.5 text-amber-400" />
                   ) : isExpanded ? (
                     <ChevronDown className="w-4 h-4 text-slate-400" />
                   ) : (
@@ -181,12 +194,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <button
                         key={lesson.id}
                         onClick={() => {
-                          onSelectLesson(lesson.id);
-                          if (window.innerWidth < 1024) onToggle();
+                          if (isModuleLocked) {
+                            openPricing();
+                          } else {
+                            onSelectLesson(lesson.id);
+                            if (window.innerWidth < 1024) onToggle();
+                          }
                         }}
                         className={`w-full p-2 rounded-lg text-left text-xs transition-all flex items-start justify-between gap-2 ${
                           isActive
                             ? 'bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30'
+                            : isModuleLocked
+                            ? 'text-slate-400 hover:bg-amber-500/10 hover:text-amber-200'
                             : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
                         }`}
                       >
@@ -198,7 +217,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         </div>
 
                         <div className="shrink-0 flex items-center gap-1.5 mt-0.5">
-                          {isCompleted ? (
+                          {isModuleLocked ? (
+                            <Lock className="w-3 h-3 text-amber-400/80" />
+                          ) : isCompleted ? (
                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                           ) : (
                             <span className="text-[10px] font-mono text-slate-500">

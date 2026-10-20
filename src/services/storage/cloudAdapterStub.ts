@@ -1,69 +1,79 @@
 import type { IProgressRepository } from './types';
 import type { UserProgress } from '../../types/progress';
+import { SupabaseProgressAdapter } from './supabaseProgressAdapter';
 
 /**
  * CloudProgressAdapterStub
- * 
- * Este adaptador representa el contrato de Fase 2 para conectar Supabase o Firebase.
- * Cuando se active la Fase 2:
- * 1. Se configura el cliente Supabase (createClient(SUPABASE_URL, SUPABASE_ANON_KEY)).
- * 2. Se reemplaza la persistencia local por consultas a las tablas 'user_progress', 'lesson_completions', etc.
- * 3. En 'progressService.ts', simplemente se reemplaza:
- *      new LocalStorageProgressAdapter() por new SupabaseProgressAdapter(supabaseClient)
- * ¡Ningún componente de React necesita modificarse!
+ * En Fase 2 delega directamente a SupabaseProgressAdapter si hay un usuario autenticado.
  */
 export class CloudProgressAdapterStub implements IProgressRepository {
   public userId?: string;
+  private delegate?: SupabaseProgressAdapter;
 
   constructor(userId?: string) {
     this.userId = userId;
+    if (userId) {
+      this.delegate = new SupabaseProgressAdapter(userId);
+    }
   }
 
   async getProgress(): Promise<UserProgress> {
-    throw new Error('Cloud adapter pendiente para Fase 2 (Supabase/Firebase). Usando LocalStorage.');
+    if (this.delegate) return this.delegate.getProgress();
+    throw new Error('No hay usuario autenticado en el CloudProgressAdapter.');
   }
 
-  async saveProgress(_progress: UserProgress): Promise<void> {
-    throw new Error('Cloud adapter pendiente para Fase 2.');
+  async saveProgress(progress: UserProgress): Promise<void> {
+    if (this.delegate) return this.delegate.saveProgress(progress);
+    throw new Error('No hay usuario autenticado en el CloudProgressAdapter.');
   }
 
-  async markLessonCompleted(_lessonId: string, _xpEarned: number): Promise<UserProgress> {
-    throw new Error('Cloud adapter pendiente para Fase 2.');
+  async markLessonCompleted(lessonId: string, xpEarned: number): Promise<UserProgress> {
+    if (this.delegate) return this.delegate.markLessonCompleted(lessonId, xpEarned);
+    throw new Error('No hay usuario autenticado en el CloudProgressAdapter.');
   }
 
-  async saveQuizResult(_lessonId: string, _scorePercent: number, _xpEarned: number): Promise<UserProgress> {
-    throw new Error('Cloud adapter pendiente para Fase 2.');
+  async saveQuizResult(lessonId: string, scorePercent: number, xpEarned: number): Promise<UserProgress> {
+    if (this.delegate) return this.delegate.saveQuizResult(lessonId, scorePercent, xpEarned);
+    throw new Error('No hay usuario autenticado en el CloudProgressAdapter.');
   }
 
-  async markExerciseCompleted(_exerciseId: string, _xpEarned: number): Promise<UserProgress> {
-    throw new Error('Cloud adapter pendiente para Fase 2.');
+  async markExerciseCompleted(exerciseId: string, xpEarned: number): Promise<UserProgress> {
+    if (this.delegate) return this.delegate.markExerciseCompleted(exerciseId, xpEarned);
+    throw new Error('No hay usuario autenticado en el CloudProgressAdapter.');
   }
 
-  async saveCodeDraft(_key: string, _code: string): Promise<void> {
-    throw new Error('Cloud adapter pendiente para Fase 2.');
+  async saveCodeDraft(key: string, code: string): Promise<void> {
+    if (this.delegate) return this.delegate.saveCodeDraft(key, code);
+    throw new Error('No hay usuario autenticado en el CloudProgressAdapter.');
   }
 
   async updateStreak(): Promise<UserProgress> {
-    throw new Error('Cloud adapter pendiente para Fase 2.');
+    if (this.delegate) return this.delegate.updateStreak();
+    throw new Error('No hay usuario autenticado en el CloudProgressAdapter.');
   }
 
-  async unlockBadge(_badgeId: string): Promise<UserProgress> {
-    throw new Error('Cloud adapter pendiente para Fase 2.');
+  async unlockBadge(badgeId: string): Promise<UserProgress> {
+    if (this.delegate) return this.delegate.unlockBadge(badgeId);
+    throw new Error('No hay usuario autenticado en el CloudProgressAdapter.');
   }
 
-  async saveLevelTestResult(_recommendedModuleId: number): Promise<UserProgress> {
-    throw new Error('Cloud adapter pendiente para Fase 2.');
+  async saveLevelTestResult(recommendedModuleId: number): Promise<UserProgress> {
+    if (this.delegate) return this.delegate.saveLevelTestResult(recommendedModuleId);
+    throw new Error('No hay usuario autenticado en el CloudProgressAdapter.');
   }
 
   async exportData(): Promise<string> {
-    throw new Error('Cloud adapter pendiente para Fase 2.');
+    if (this.delegate) return this.delegate.exportData();
+    throw new Error('No hay usuario autenticado en el CloudProgressAdapter.');
   }
 
-  async importData(_jsonData: string): Promise<{ success: boolean; message: string; data?: UserProgress }> {
-    throw new Error('Cloud adapter pendiente para Fase 2.');
+  async importData(jsonData: string): Promise<{ success: boolean; message: string; data?: UserProgress }> {
+    if (this.delegate) return this.delegate.importData(jsonData);
+    throw new Error('No hay usuario autenticado en el CloudProgressAdapter.');
   }
 
   async resetProgress(): Promise<UserProgress> {
-    throw new Error('Cloud adapter pendiente para Fase 2.');
+    if (this.delegate) return this.delegate.resetProgress();
+    throw new Error('No hay usuario autenticado en el CloudProgressAdapter.');
   }
 }

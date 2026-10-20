@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { Lesson, Module, ExplanationSection, Exercise } from '../types/curriculum';
 import { useProgress } from '../hooks/useProgress';
+import { useBilling } from '../contexts/BillingContext';
 import { CodeMirrorWrapper } from '../components/editor/CodeMirrorWrapper';
 import { TerminalView } from '../components/editor/TerminalView';
 import { ExerciseCard } from '../components/lesson/ExerciseCard';
@@ -22,6 +23,7 @@ import {
   Code2,
   Terminal,
   FileCheck,
+  Lock,
 } from 'lucide-react';
 
 interface LessonViewProps {
@@ -36,6 +38,9 @@ export const LessonView: React.FC<LessonViewProps> = ({
   onNavigateLesson,
 }) => {
   const { progress, markLessonCompleted, markExerciseCompleted, saveQuizResult } = useProgress();
+  const { hasModuleAccess, openPricing } = useBilling();
+
+  const isLocked = !hasModuleAccess(module.id);
 
   // Estado del Playground
   const [playgroundCode, setPlaygroundCode] = useState(lesson.interactivePlayground.initialCode);
@@ -66,6 +71,62 @@ export const LessonView: React.FC<LessonViewProps> = ({
   const currentIdx = module.lessons.findIndex((l: Lesson) => l.id === lesson.id);
   const prevLesson = currentIdx > 0 ? module.lessons[currentIdx - 1] : null;
   const nextLesson = currentIdx < module.lessons.length - 1 ? module.lessons[currentIdx + 1] : null;
+
+  if (isLocked) {
+    return (
+      <div className="max-w-3xl mx-auto py-12 px-4 animate-fade-in text-center space-y-6">
+        <div className="p-8 sm:p-12 rounded-3xl bg-slate-900 border border-amber-500/30 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400 mb-4 shadow-lg shadow-amber-500/10">
+            <Lock className="w-8 h-8" />
+          </div>
+
+          <div className="space-y-2">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-400">
+              Módulo 0{module.id} • Contenido Exclusivo Plan Pro
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-black text-white">{lesson.title}</h2>
+            <p className="text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+              {lesson.objective}
+            </p>
+          </div>
+
+          <div className="my-6 p-5 bg-slate-950/70 rounded-2xl border border-slate-800 text-left max-w-lg mx-auto space-y-3">
+            <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-emerald-400" /> Lo que aprenderás en este módulo
+            </span>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              {module.description}
+            </p>
+            <div className="flex items-center gap-4 text-xs font-mono text-slate-400 pt-2 border-t border-slate-800">
+              <span>⏱️ {lesson.estimatedTime}</span>
+              <span>⭐ +{lesson.xpReward} XP</span>
+              <span>🔒 5 lecciones avanzadas</span>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button
+              onClick={openPricing}
+              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-sky-500 hover:from-emerald-400 hover:to-sky-400 text-slate-950 font-bold text-sm flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/25 active:scale-95 transition-all"
+            >
+              <Sparkles className="w-4 h-4 fill-slate-950" />
+              <span>Desbloquear Carrera Pro</span>
+            </button>
+
+            <button
+              onClick={() => onNavigateLesson('m1-l1-como-funciona-internet')}
+              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold text-xs border border-slate-700 transition"
+            >
+              Volver a Módulos Gratuitos
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 pb-20">

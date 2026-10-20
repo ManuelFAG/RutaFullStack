@@ -7,6 +7,7 @@ import { LessonView } from './views/LessonView';
 import { LevelTestView } from './views/LevelTestView';
 import { GlossaryView } from './views/GlossaryView';
 import { ResourcesView } from './views/ResourcesView';
+import { CRMView } from './views/CRMView';
 import { getLessonById, ALL_MODULES } from './data/modules';
 import { useProgress } from './hooks/useProgress';
 import { Heart } from 'lucide-react';
@@ -29,7 +30,7 @@ export function App() {
         const id = hash.replace('lesson/', '');
         setCurrentLessonId(id);
         setCurrentView('lesson');
-      } else if (['home', 'dashboard', 'test', 'glossary', 'resources'].includes(hash)) {
+      } else if (['home', 'dashboard', 'test', 'glossary', 'resources', 'crm'].includes(hash)) {
         setCurrentView(hash as ActiveView);
       }
     };
@@ -118,6 +119,8 @@ export function App() {
           )}
 
           {currentView === 'resources' && <ResourcesView />}
+
+          {currentView === 'crm' && <CRMView />}
         </main>
       </div>
 
@@ -137,8 +140,9 @@ export function App() {
             <span>para nuevos desarrolladores</span>
           </div>
 
-          <div className="text-[11px] text-slate-600 font-mono">
-            Fase 1: Motor local desacoplado (100% libre)
+          <div className="text-[11px] text-emerald-500/80 font-mono flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block"></span>
+            Fase 2: Supabase Cloud Activo (PostgreSQL + Auth + RLS)
           </div>
         </div>
       </footer>
