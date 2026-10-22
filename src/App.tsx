@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Navbar, type ActiveView } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
 import { HomeView } from './views/HomeView';
@@ -8,6 +8,7 @@ import { LevelTestView } from './views/LevelTestView';
 import { GlossaryView } from './views/GlossaryView';
 import { ResourcesView } from './views/ResourcesView';
 import { CRMView } from './views/CRMView';
+import { LegalView } from './views/LegalView';
 import { getLessonById, ALL_MODULES } from './data/modules';
 import { useProgress } from './hooks/useProgress';
 import { Heart } from 'lucide-react';
@@ -20,7 +21,7 @@ export function App() {
   );
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Sincronización con window.location.hash
+  // SincronizaciÃ³n con window.location.hash
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
@@ -70,7 +71,7 @@ export function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 dark:bg-[#080b11] font-sans selection:bg-emerald-500/30 selection:text-emerald-300">
-      {/* Barra de navegación global */}
+      {/* Barra de navegaciÃ³n global */}
       <Navbar currentView={currentView} onNavigate={navigateToView} />
 
       {/* Contenedor Principal */}
@@ -131,11 +132,11 @@ export function App() {
             <span className="font-extrabold text-slate-300 tracking-tight">
               Ruta<span className="text-emerald-400">FullStack</span>
             </span>
-            <span>— Plataforma educativa interactiva</span>
+            <span>â€” Plataforma educativa interactiva</span>
           </div>
 
           <div className="flex items-center gap-1.5 text-slate-400">
-            <span>Construido con dedicación pedagógica</span>
+            <span>Construido con dedicaciÃ³n pedagÃ³gica</span>
             <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 inline" />
             <span>para nuevos desarrolladores</span>
           </div>
@@ -151,3 +152,6 @@ export function App() {
 }
 
 export default App;
+
+
+
